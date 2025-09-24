@@ -5,23 +5,35 @@
     data-category="{{ .Site.Params.giscus.category }}"
     data-category-id="{{ .Site.Params.giscus.categoryID }}"
     data-mapping="{{ .Site.Params.giscus.mapping | default "pathname" }}"
-    data-reactions-enabled="{{ .Site.Params.giscus.reactionsEnabled | default "1" }}"
+    data-reactions-enabled="{{ .Site.Params.giscus.reactionsEnabled | default "0" }}"
     data-emit-metadata="{{ .Site.Params.giscus.emitMetadata | default "0" }}"
     data-input-position="{{ .Site.Params.giscus.inputPosition | default "bottom" }}"
-    data-theme="{{ .Site.Params.giscus.theme | default "preferred_color_scheme" }}"
+    data-theme="noborder_light"  <!-- 초기값은 라이트로 두고, 아래 JS가 즉시 맞춰줌 -->
     data-lang="{{ .Site.Params.giscus.lang | default "ko" }}"
     crossorigin="anonymous" async>
   </script>
 </div>
 
-<!-- PaperMod 테마 토글에 맞춰 giscus 테마 자동 전환 -->
 <script>
 (function () {
-  function currentTheme() {
-    // PaperMod는 html 또는 body에 'dark' 클래스를 붙입니다.
-    return document.documentElement.classList.contains('dark')
-      ? 'noborder_dark'
-      : 'noborder_light';
+  // PaperMod는 html 또는 body에 'dark' 클래스를 붙이고,
+  // localStorage('pref-theme')에도 'dark'/'light'를 저장합니다.
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+  function isDark() {
+    const pref = localStorage.getItem('pref-theme');
+    if (pref === 'dark') return true;
+    if (pref === 'light') return false;
+    // 저장값이 없으면, DOM 클래스나 시스템 선호도를 따른다
+    return (
+      document.documentElement.classList.contains('dark') ||
+      document.body.classList.contains('dark') ||
+      prefersDark.matches
+    );
+  }
+
+  function themeName() {
+    return isDark() ? 'noborder_dark' : 'noborder_light';
   }
 
   function setGiscusTheme(theme) {
@@ -33,19 +45,28 @@
     );
   }
 
-  // 초기 1회 동기화
-  const syncOnce = () => setGiscusTheme(currentTheme());
-  // giscus iframe이 로드된 뒤 실행
-  window.addEventListener('message', (event) => {
-    if (event.origin !== 'https://giscus.app') return;
-    if (event.data?.giscus?.discussion) syncOnce();
-  });
+  // iframe 등장 시점까지 대기 후 1회 적용
+  const waitAndApply = () => {
+    const i = document.querySelector('iframe.giscus-frame');
+    if (i) setGiscusTheme(themeName());
+    else requestAnimationFrame(waitAndApply);
+  };
+  waitAndApply();
 
-  // 테마 토글 클릭 시 동기화 (PaperMod의 토글 셀렉터 대응)
+  // PaperMod 토글 버튼 클릭 시 반영 (둘 다 대응)
   document.addEventListener('click', (e) => {
     if (e.target.closest('.theme-toggle') || e.target.closest('#theme-toggle')) {
-      setTimeout(syncOnce, 50);
+      // DOM 클래스 갱신 후 반영
+      setTimeout(() => setGiscusTheme(themeName()), 60);
     }
   });
+
+  // 시스템 테마가 바뀔 때도 반영
+  prefersDark.addEventListener('change', () => setGiscusTheme(themeName()));
+
+  // html/body의 class 변화도 감지(직접 클래스를 바꾸는 테마 스위처 대응)
+  const mo = new MutationObserver(() => setGiscusTheme(themeName()));
+  mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+  mo.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 })();
 </script>
