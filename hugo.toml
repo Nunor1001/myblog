@@ -68,3 +68,14 @@ enableGitInfo = true         # 마지막 수정일 자동 반영용
   name = "Search"
   url  = "/search/"
   weight = 30
+
+[params.giscus]
+  repo = "Nunor1001/myblog"
+  repoID = "R_kgDOP1xJJA"        # giscus에서 복사
+  category = "General"
+  categoryID = "DIC_kwDOP1xJJM4Cv1OL"  # giscus에서 복사
+  mapping = "pathname"
+  theme = "preferred_color_scheme"
+  reactionsEnabled = "1"
+  emitMetadata = "0"
+
