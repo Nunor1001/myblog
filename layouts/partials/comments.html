@@ -8,7 +8,7 @@
     data-reactions-enabled="{{ .Site.Params.giscus.reactionsEnabled | default "0" }}"
     data-emit-metadata="{{ .Site.Params.giscus.emitMetadata | default "0" }}"
     data-input-position="{{ .Site.Params.giscus.inputPosition | default "bottom" }}"
-    data-theme="noborder_light"  <!-- 초기값은 라이트로 두고, 아래 JS가 즉시 맞춰줌 -->
+    data-theme="noborder_light"
     data-lang="{{ .Site.Params.giscus.lang | default "ko" }}"
     crossorigin="anonymous" async>
   </script>
@@ -16,15 +16,12 @@
 
 <script>
 (function () {
-  // PaperMod는 html 또는 body에 'dark' 클래스를 붙이고,
-  // localStorage('pref-theme')에도 'dark'/'light'를 저장합니다.
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
 
   function isDark() {
     const pref = localStorage.getItem('pref-theme');
     if (pref === 'dark') return true;
     if (pref === 'light') return false;
-    // 저장값이 없으면, DOM 클래스나 시스템 선호도를 따른다
     return (
       document.documentElement.classList.contains('dark') ||
       document.body.classList.contains('dark') ||
@@ -45,7 +42,7 @@
     );
   }
 
-  // iframe 등장 시점까지 대기 후 1회 적용
+  // iframe 로드 시점까지 기다렸다가 1회 동기화
   const waitAndApply = () => {
     const i = document.querySelector('iframe.giscus-frame');
     if (i) setGiscusTheme(themeName());
@@ -53,18 +50,17 @@
   };
   waitAndApply();
 
-  // PaperMod 토글 버튼 클릭 시 반영 (둘 다 대응)
+  // PaperMod 테마 토글 클릭 시 동기화
   document.addEventListener('click', (e) => {
     if (e.target.closest('.theme-toggle') || e.target.closest('#theme-toggle')) {
-      // DOM 클래스 갱신 후 반영
       setTimeout(() => setGiscusTheme(themeName()), 60);
     }
   });
 
-  // 시스템 테마가 바뀔 때도 반영
+  // 시스템 테마 변경 감지
   prefersDark.addEventListener('change', () => setGiscusTheme(themeName()));
 
-  // html/body의 class 변화도 감지(직접 클래스를 바꾸는 테마 스위처 대응)
+  // html/body class 변화도 감지
   const mo = new MutationObserver(() => setGiscusTheme(themeName()));
   mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
   mo.observe(document.body, { attributes: true, attributeFilter: ['class'] });
