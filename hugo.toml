@@ -30,6 +30,7 @@ enableGitInfo = true         # 마지막 수정일 자동 반영용
   TocOpen = false
   ShowLastMod = true             # 마지막 수정일 표기
   comments = true               # 필요하면 true + 시스템 설정
+  customCSS = ["css/override.css"]
   # 홈 히어로(optional)
   homeInfoParams = { Title = "Data, calmly observed.", Content = "데이터로 사회를 해석하는 저널" }
 

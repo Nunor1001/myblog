@@ -1,17 +1,51 @@
-{{- $p := .Site.Params -}}
-{{- if and ($p.comments) ($p.giscus) -}}
+<div class="giscus-container">
   <script src="https://giscus.app/client.js"
-    data-repo="{{ $p.giscus.repo }}"
-    data-repo-id="{{ $p.giscus.repoID }}"
-    data-category="{{ $p.giscus.category }}"
-    data-category-id="{{ $p.giscus.categoryID }}"
-    data-mapping="{{ $p.giscus.mapping | default "pathname" }}"
-    data-reactions-enabled="{{ $p.giscus.reactionsEnabled | default "1" }}"
-    data-emit-metadata="{{ $p.giscus.emitMetadata | default "0" }}"
-    data-input-position="{{ $p.giscus.inputPosition | default "bottom" }}"
-    data-theme="{{ $p.giscus.theme | default "preferred_color_scheme" }}"
-    data-lang="{{ $p.giscus.lang | default "ko" }}"
-    crossorigin="anonymous"
-    async>
+    data-repo="{{ .Site.Params.giscus.repo }}"
+    data-repo-id="{{ .Site.Params.giscus.repoID }}"
+    data-category="{{ .Site.Params.giscus.category }}"
+    data-category-id="{{ .Site.Params.giscus.categoryID }}"
+    data-mapping="{{ .Site.Params.giscus.mapping | default "pathname" }}"
+    data-reactions-enabled="{{ .Site.Params.giscus.reactionsEnabled | default "1" }}"
+    data-emit-metadata="{{ .Site.Params.giscus.emitMetadata | default "0" }}"
+    data-input-position="{{ .Site.Params.giscus.inputPosition | default "bottom" }}"
+    data-theme="{{ .Site.Params.giscus.theme | default "preferred_color_scheme" }}"
+    data-lang="{{ .Site.Params.giscus.lang | default "ko" }}"
+    crossorigin="anonymous" async>
   </script>
-{{- end -}}
+</div>
+
+<!-- PaperMod 테마 토글에 맞춰 giscus 테마 자동 전환 -->
+<script>
+(function () {
+  function currentTheme() {
+    // PaperMod는 html 또는 body에 'dark' 클래스를 붙입니다.
+    return document.documentElement.classList.contains('dark')
+      ? 'noborder_dark'
+      : 'noborder_light';
+  }
+
+  function setGiscusTheme(theme) {
+    const iframe = document.querySelector('iframe.giscus-frame');
+    if (!iframe) return;
+    iframe.contentWindow.postMessage(
+      { giscus: { setConfig: { theme } } },
+      'https://giscus.app'
+    );
+  }
+
+  // 초기 1회 동기화
+  const syncOnce = () => setGiscusTheme(currentTheme());
+  // giscus iframe이 로드된 뒤 실행
+  window.addEventListener('message', (event) => {
+    if (event.origin !== 'https://giscus.app') return;
+    if (event.data?.giscus?.discussion) syncOnce();
+  });
+
+  // 테마 토글 클릭 시 동기화 (PaperMod의 토글 셀렉터 대응)
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.theme-toggle') || e.target.closest('#theme-toggle')) {
+      setTimeout(syncOnce, 50);
+    }
+  });
+})();
+</script>
