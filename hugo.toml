@@ -29,7 +29,7 @@ enableGitInfo = true         # 마지막 수정일 자동 반영용
   ShowToc = true                 # 글 내 목차
   TocOpen = false
   ShowLastMod = true             # 마지막 수정일 표기
-  comments = True               # 필요하면 true + 시스템 설정
+  comments = true               # 필요하면 true + 시스템 설정
   # 홈 히어로(optional)
   homeInfoParams = { Title = "Data, calmly observed.", Content = "데이터로 사회를 해석하는 저널" }
 
@@ -78,3 +78,6 @@ enableGitInfo = true         # 마지막 수정일 자동 반영용
   theme = "preferred_color_scheme"
   reactionsEnabled = "1"
   emitMetadata = "0"
+
+
+
