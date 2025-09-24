@@ -2,6 +2,7 @@
 title: "내 첫 글"
 date: 2025-09-24
 draft: false
+comments: true
 ---
 
 여기는 본문입니다.  
