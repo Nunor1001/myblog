@@ -1,0 +1,10 @@
+# Hugo build artifacts
+public/
+resources/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+
+# Node (혹시 쓰는 경우)
+node_modules/
